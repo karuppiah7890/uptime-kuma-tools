@@ -1,5 +1,6 @@
 from uptime_kuma_api import UptimeKumaApi
 import time
+import json
 
 api = UptimeKumaApi('http://localhost:3001')
 
@@ -16,7 +17,7 @@ ids_of_monitors = list(map(lambda monitor: monitor["id"], list_of_monitors))
 raise Exception("Please ensure you are connected to the v2.0.0-beta.3 version of Uptime Kuma. Please comment this line in the source code to proceed")
 
 # Importing the data before deleting the data
-with open(f"liat-of-monitors-{time.time_ns()}.json", "w") as dump_file:
+with open(f"list-of-monitors-that-are-gonna-be-deleted-{time.time_ns()}.json", "w") as dump_file:
     json.dump(list_of_monitors, dump_file)
 
 # Double checking the server version before deleting all the monitors
