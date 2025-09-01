@@ -1,0 +1,17 @@
+<!-- TODO -->
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+
+<script>
+    const socket = io("http://localhost:3001");
+
+    // client-side. Socket ID
+    socket.on("connect", () => {
+        console.log(`We are on client side. Socket ID is: ${socket.id}`); // x8WIv7-mJelg7on_ALbx
+        console.log(`We are connected to the server (True/False): ${socket.connected}`); // true
+    });
+
+    socket.on("disconnect", () => {
+        console.log(`We are connected to the server (True/False): ${socket.connected}`); // false
+    });
+</script>
+
