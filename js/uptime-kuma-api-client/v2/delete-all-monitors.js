@@ -16,9 +16,11 @@ socket.on("monitorList", (data) => {
 
     for (const monitorID in data) {
         console.log(`deleting ${monitorID}`);
-        socket.emit("deleteMonitor", monitorID, (response) => {
-            console.log(response);
-        })
+        // Please ensure you are connected to the v2.0.0-beta.3 version of Uptime Kuma. Please comment this line in the source code to proceed
+        throw new Error("Please ensure you are connected to the v2.0.0-beta.3 version of Uptime Kuma. Please comment this line in the source code to proceed. And uncomment the delete monitor event emission");
+        // socket.emit("deleteMonitor", monitorID, (response) => {
+        //     console.log(response);
+        // })
     }
 })
 
