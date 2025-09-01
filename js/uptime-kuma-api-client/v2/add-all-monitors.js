@@ -20,6 +20,135 @@ const monitorsAdded = {}
 
 const oldMonitors = JSON.parse(String(fs.readFileSync("all-monitors.json")))
 
+function getRequestDataForAddMonitorOperation(oldMonitor, parent) {
+
+    // TODO:
+    // 1. Check if we need to add timeout for group
+    // 2. Check if we need to add weight for everything
+
+    // Ignoring a lot of the fields for the different types we use
+
+    const {
+        active,
+        // forceInactive,
+        type,
+        name,
+        interval,
+        maxretries,
+        retryInterval,
+        resendInterval,
+        upsideDown,
+        description,
+        // maintenance,
+    } = oldMonitor
+
+    const base = {
+        active,
+        // forceInactive,
+        type,
+        name,
+        accepted_statuscodes: [], // Not used I think. Check once and verify
+        notificationIDList: [], // DONT Setup Notification for now
+        interval,
+        maxretries,
+        retryInterval,
+        resendInterval,
+        upsideDown,
+        parent: parent,
+        description,
+        // maintenance,
+    }
+
+    if (oldMonitor.type === "group") {
+        return base
+    }
+
+    if (oldMonitor.type === "json-query" || oldMonitor.type === "http") {
+        const {
+            method,
+            headers,
+            body,
+            url,
+            httpBodyEncoding,
+            accepted_statuscodes,
+            maxredirects,
+            timeout,
+            expiryNotification,
+            ignoreTls,
+            authMethod,
+            basic_auth_user,
+            basic_auth_pass,
+            oauth_client_id,
+            oauth_client_secret,
+            oauth_token_url,
+            oauth_scopes,
+            oauth_auth_method,
+            authWorkstation,
+            authDomain,
+            tlsCa,
+            tlsCert,
+            tlsKey,
+        } = oldMonitor
+
+
+        const addMonitorRequestDataForHTTPMonitor = {
+            ...base,
+            method,
+            headers,
+            body,
+            url,
+            httpBodyEncoding,
+            accepted_statuscodes,
+            maxredirects,
+            timeout,
+            expiryNotification,
+            ignoreTls,
+            authMethod,
+            basic_auth_user,
+            basic_auth_pass,
+            oauth_client_id,
+            oauth_client_secret,
+            oauth_token_url,
+            oauth_scopes,
+            oauth_auth_method,
+            authWorkstation,
+            authDomain,
+            tlsCa,
+            tlsCert,
+            tlsKey,
+        }
+
+        if (oldMonitor.type === "http") {
+            return addMonitorRequestDataForHTTPMonitor
+        }
+
+        const {
+            jsonPath,
+            expectedValue
+        } = oldMonitor
+
+        let {
+            jsonPathOperator
+        } = oldMonitor
+
+        if (!jsonPathOperator) {
+            jsonPathOperator = "=="
+            // Other values for JSON Path Operator are: < , > , <= , >= , contains
+        }
+
+        const addMonitorRequestDataForJSONQueryMonitor = {
+            ...addMonitorRequestDataForHTTPMonitor,
+            jsonPath,
+            jsonPathOperator,
+            expectedValue,
+        }
+
+        return addMonitorRequestDataForJSONQueryMonitor
+    }
+
+    return null
+}
+
 function addMonitorsWithParent(oldMonitorIDOfTheParentToLookFor) {
     for (const oldMonitorID in oldMonitors) {
         console.log(`current monitors added: ${JSON.stringify(monitorsAdded)}`);
@@ -30,9 +159,8 @@ function addMonitorsWithParent(oldMonitorIDOfTheParentToLookFor) {
 
         const oldMonitor = oldMonitors[oldMonitorID]
 
-        // Only add group monitors for now
-        if (oldMonitor.type !== "group") {
-            monitorsAdded[oldMonitorID] = "some-dummy-bad-non-number-value"
+        if (oldMonitor.type !== "group" && oldMonitor.type !== "json-query" && oldMonitor.type !== "http") {
+            monitorsAdded[oldMonitorID] = "dummy"
             continue
         }
 
@@ -51,18 +179,10 @@ function addMonitorsWithParent(oldMonitorIDOfTheParentToLookFor) {
             }
         }
 
-        const addMonitorRequestData = {
-            type: oldMonitor.type,
-            name: oldMonitor.name,
-            accepted_statuscodes: [], // Not used I think. Check once and verify
-            notificationIDList: [], // Not used I think. Check once and verify
-            interval: oldMonitor.interval,
-            maxretries: oldMonitor.maxretries,
-            retryInterval: oldMonitor.retryInterval,
-            resendInterval: oldMonitor.resendInterval,
-            upsideDown: oldMonitor.upsideDown,
-            parent: parent,
-            description: oldMonitor.description,
+        const addMonitorRequestData = getRequestDataForAddMonitorOperation(oldMonitor, parent)
+
+        if (addMonitorRequestData === null) {
+            continue
         }
 
         console.log(addMonitorRequestData);
