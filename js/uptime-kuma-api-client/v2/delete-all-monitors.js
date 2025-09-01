@@ -13,6 +13,13 @@ utils.listenOnSocketManager(socket)
 socket.on("monitorList", (data) => {
     console.log(`Monitor List is: ${JSON.stringify(data)}`)
     fs.writeFileSync(`list-of-monitors-${Date.now()}.json`, JSON.stringify(data, null, 2))
+
+    for (const monitorID in data) {
+        console.log(`deleting ${monitorID}`);
+        socket.emit("deleteMonitor", monitorID, (response) => {
+            console.log(response);
+        })
+    }
 })
 
 socket.on("loginRequired", () => {
@@ -21,6 +28,3 @@ socket.on("loginRequired", () => {
 })
 
 utils.listenOnSocket(socket)
-
-console.log("maybe not getting loginRequired event. logging in on our own");
-utils.login(socket)

@@ -27,14 +27,13 @@ socket.on("loginRequired", () => {
             name: `Group ${Math.random()*1000}`,
             accepted_statuscodes: [], // Not used I think. Check once and verify
             notificationIDList: [], // Not used I think. Check once and verify
-            interval: 0,
+            interval: 20,
             maxretries: 0,
             retryInterval: 0,
             resendInterval: 0,
             upsideDown: false,
-            parent: 0,
+            parent: null,
             description: "",
-            tags: []
         }
 
         socket.emit("add", addMonitorRequestData, (response) => {
