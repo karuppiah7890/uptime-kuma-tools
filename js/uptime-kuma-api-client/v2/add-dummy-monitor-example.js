@@ -1,6 +1,6 @@
 const { io } = require("socket.io-client");
 
-const socket = io("http://localhost:3001");
+const socket = io(process.env.UPTIME_KUMA_URI);
 
 // client-side. Socket ID
 socket.on("connect", () => {
@@ -11,8 +11,8 @@ socket.on("connect", () => {
 socket.on("loginRequired", () => {
     console.log(`Server says login is required`)
     const loginCredentials = {
-        username: "admin",
-        password: "admin123"
+        username: process.env.UPTIME_KUMA_USERNAME,
+        password: process.env.UPTIME_KUMA_PASSWORD
     }
 
     // Listen to monitorList event before logging in, so that you can capture the event
@@ -25,7 +25,16 @@ socket.on("loginRequired", () => {
         const addMonitorRequestData = {
             type: "group",
             name: `Group ${Math.random()*1000}`,
-            accepted_statuscodes: []
+            accepted_statuscodes: [], // Not used I think. Check once and verify
+            notificationIDList: [], // Not used I think. Check once and verify
+            interval: 0,
+            maxretries: 0,
+            retryInterval: 0,
+            resendInterval: 0,
+            upsideDown: false,
+            parent: 0,
+            description: "",
+            tags: []
         }
 
         socket.emit("add", addMonitorRequestData, (response) => {
