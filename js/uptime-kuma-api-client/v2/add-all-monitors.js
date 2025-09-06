@@ -30,7 +30,6 @@ function getRequestDataForAddMonitorOperation(oldMonitor, parent) {
 
     const {
         active,
-        // forceInactive,
         type,
         name,
         interval,
@@ -39,12 +38,10 @@ function getRequestDataForAddMonitorOperation(oldMonitor, parent) {
         resendInterval,
         upsideDown,
         description,
-        // maintenance,
     } = oldMonitor
 
     const base = {
         active,
-        // forceInactive,
         type,
         name,
         accepted_statuscodes: [], // Not used I think. Check once and verify
@@ -56,7 +53,6 @@ function getRequestDataForAddMonitorOperation(oldMonitor, parent) {
         upsideDown,
         parent: parent,
         description,
-        // maintenance,
     }
 
     if (oldMonitor.type === "group") {
