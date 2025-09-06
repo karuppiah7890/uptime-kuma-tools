@@ -11,7 +11,7 @@ console.log("listening for events");
 utils.listenOnSocketManager(socket)
 
 socket.on("monitorList", (data) => {
-    console.log(`Monitor List is: ${JSON.stringify(data)}`)
+    console.log(`monitor List is: ${JSON.stringify(data)}`)
     fs.writeFileSync(`list-of-monitors-${Date.now()}.json`, JSON.stringify(data, null, 2))
 })
 
@@ -180,13 +180,13 @@ function addMonitorsWithParent(oldMonitorIDOfTheParentToLookFor) {
             continue
         }
 
-        console.log(addMonitorRequestData);
+        console.log(`adding monitor: ${addMonitorRequestData}`);
 
         socket.emit("add", addMonitorRequestData, (response) => {
-            console.log(`Monitor Addition Response: ${JSON.stringify(response)}`)
+            console.log(`monitor addition response: ${JSON.stringify(response)}`)
 
             if (response.ok) {
-                console.log("Monitor Added Successfully")
+                console.log("monitor Added Successfully")
                 const newMonitorID = response.monitorID
                 monitorsAdded[oldMonitorID] = newMonitorID
                 addMonitorsWithParent(oldMonitorID)
