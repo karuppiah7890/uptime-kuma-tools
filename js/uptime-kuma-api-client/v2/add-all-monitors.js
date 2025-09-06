@@ -1,6 +1,7 @@
 const utils = require('../utils.js')
 const { io } = require("socket.io-client");
 const fs = require('fs');
+const { getMonitorsAndTheirParents } = require('./utils')
 
 console.log("starting now")
 
@@ -145,8 +146,47 @@ function getRequestDataForAddMonitorOperation(oldMonitor, parent) {
     return null
 }
 
-function addMonitorsWithParent(oldMonitorIDOfTheParentToLookFor) {
-    for (const oldMonitorID in oldMonitors) {
+function addMonitorsWithOutParent(oldMonitorIDsWithoutParent, oldMonitorIDsWithTheirChildren) {
+    for (const oldMonitorIDWithoutParent of oldMonitorIDsWithoutParent) {
+        console.log(`current monitors added: ${JSON.stringify(monitorsAdded)}`);
+
+        if (oldMonitorIDWithoutParent in monitorsAdded) {
+            continue
+        }
+
+        const oldMonitor = oldMonitors[oldMonitorIDWithoutParent]
+
+        if (oldMonitor.type !== "group" && oldMonitor.type !== "json-query" && oldMonitor.type !== "http") {
+            monitorsAdded[oldMonitorIDWithoutParent] = "dummy"
+            continue
+        }
+
+        const addMonitorRequestData = getRequestDataForAddMonitorOperation(oldMonitor, null)
+
+        if (addMonitorRequestData === null) {
+            continue
+        }
+
+        console.log(`adding monitor: ${addMonitorRequestData}`);
+
+        socket.emit("add", addMonitorRequestData, (response) => {
+            console.log(`monitor addition response: ${JSON.stringify(response)}`)
+
+            if (response.ok) {
+                console.log("monitor Added Successfully")
+                const newMonitorID = response.monitorID
+                monitorsAdded[oldMonitorIDWithoutParent] = newMonitorID
+                addMonitorsWithParent(oldMonitorIDWithoutParent, oldMonitorIDsWithTheirChildren)
+
+                console.log(`updated monitors added: ${JSON.stringify(monitorsAdded)}`);
+            }
+        })
+    }
+}
+
+function addMonitorsWithParent(oldMonitorIDOfTheParentToLookFor, oldMonitorIDsWithTheirChildren) {
+    const oldMonitorIDsOfTheChildrenOfTheParent = oldMonitorIDsWithTheirChildren[oldMonitorIDOfTheParentToLookFor]
+    for (const oldMonitorID of oldMonitorIDsOfTheChildrenOfTheParent) {
         console.log(`current monitors added: ${JSON.stringify(monitorsAdded)}`);
 
         if (oldMonitorID in monitorsAdded) {
@@ -189,7 +229,7 @@ function addMonitorsWithParent(oldMonitorIDOfTheParentToLookFor) {
                 console.log("monitor Added Successfully")
                 const newMonitorID = response.monitorID
                 monitorsAdded[oldMonitorID] = newMonitorID
-                addMonitorsWithParent(oldMonitorID)
+                addMonitorsWithParent(oldMonitorID, oldMonitorIDsWithTheirChildren)
 
                 console.log(`updated monitors added: ${JSON.stringify(monitorsAdded)}`);
             }
@@ -200,7 +240,15 @@ function addMonitorsWithParent(oldMonitorIDOfTheParentToLookFor) {
 socket.on("loginRequired", () => {
     console.log(`Server says login is required`)
     utils.login(socket, () => {
-        addMonitorsWithParent(null)
+        const {
+            oldMonitorIDsWithoutParent,
+            oldMonitorIDsWithTheirChildren,
+        } = getMonitorsAndTheirParents(oldMonitors)
+
+        console.log(oldMonitorIDsWithoutParent);
+        console.log(oldMonitorIDsWithTheirChildren);
+
+        addMonitorsWithOutParent(oldMonitorIDsWithoutParent, oldMonitorIDsWithTheirChildren)
     })
 })
 
