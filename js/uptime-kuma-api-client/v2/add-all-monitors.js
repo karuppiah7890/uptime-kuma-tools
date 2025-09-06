@@ -174,8 +174,7 @@ function addMonitorsWithParent(oldMonitorIDOfTheParentToLookFor) {
             if (oldMonitor.parent in monitorsAdded) {
                 parent = monitorsAdded[oldMonitor.parent]
             } else {
-                console.log("Found a parent that is NOT added yet!");
-                continue
+                throw new Error("Found a parent that is NOT added yet!")
             }
         }
 
