@@ -181,6 +181,8 @@ function addMonitorsWithOutParent(oldMonitorIDsWithoutParent, oldMonitorIDsWithT
 
                 console.log(`updated monitors added: ${JSON.stringify(monitorsAdded)}`);
                 fs.writeFileSync(`list-of-monitors-added-${Date.now()}.json`, JSON.stringify(monitorsAdded, null, 2))
+            } else {
+                throw new Error(`error adding monitor! response: ${JSON.stringify(response, null, 2)}`);
             }
         })
     }
