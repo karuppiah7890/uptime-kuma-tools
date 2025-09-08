@@ -1,3 +1,6 @@
 list*.json
 node_modules
 all-monitors.json
+
+# any kubernetes pod stuff
+*pod*/
