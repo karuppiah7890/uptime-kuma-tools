@@ -149,6 +149,7 @@ function getRequestDataForAddMonitorOperation(oldMonitor, parent) {
 function addMonitorsWithOutParent(oldMonitorIDsWithoutParent, oldMonitorIDsWithTheirChildren) {
     for (const oldMonitorIDWithoutParent of oldMonitorIDsWithoutParent) {
         console.log(`current monitors added: ${JSON.stringify(monitorsAdded)}`);
+        fs.writeFileSync(`list-of-monitors-added-${Date.now()}.json`, JSON.stringify(monitorsAdded, null, 2))
 
         if (oldMonitorIDWithoutParent in monitorsAdded) {
             continue
@@ -179,6 +180,7 @@ function addMonitorsWithOutParent(oldMonitorIDsWithoutParent, oldMonitorIDsWithT
                 addMonitorsWithParent(oldMonitorIDWithoutParent, oldMonitorIDsWithTheirChildren)
 
                 console.log(`updated monitors added: ${JSON.stringify(monitorsAdded)}`);
+                fs.writeFileSync(`list-of-monitors-added-${Date.now()}.json`, JSON.stringify(monitorsAdded, null, 2))
             }
         })
     }
