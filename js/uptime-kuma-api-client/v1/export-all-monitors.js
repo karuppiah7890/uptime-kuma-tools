@@ -22,5 +22,5 @@ socket.on("loginRequired", () => {
 
 utils.listenOnSocket(socket)
 
-console.log("maybe not getting loginRequired event. logging in on our own");
-utils.login(socket)
+// console.log("maybe not getting loginRequired event. logging in on our own");
+// utils.login(socket)
