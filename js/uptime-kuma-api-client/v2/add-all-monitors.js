@@ -19,7 +19,7 @@ socket.on("monitorList", (data) => {
 // mapping of Old Monitor ID to New Monitor ID
 const monitorsAdded = {}
 
-const oldMonitors = JSON.parse(String(fs.readFileSync("all-monitors.json")))
+const oldMonitors = JSON.parse(String(fs.readFileSync(process.env.UPTIME_KUMA_MONITORS_TO_ADD_JSON)))
 
 function getRequestDataForAddMonitorOperation(oldMonitor, parent) {
 
