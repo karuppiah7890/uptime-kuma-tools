@@ -146,10 +146,14 @@ function getRequestDataForAddMonitorOperation(oldMonitor, parent) {
     return null
 }
 
+function writeToListOfMonitorsAddedFile(monitorsAdded) {
+    fs.writeFileSync(`list-of-monitors-added-${Date.now()}.json`, JSON.stringify(monitorsAdded, null, 2))
+}
+
 function addMonitorsWithOutParent(oldMonitorIDsWithoutParent, oldMonitorIDsWithTheirChildren) {
     for (const oldMonitorIDWithoutParent of oldMonitorIDsWithoutParent) {
         console.log(`current monitors added: ${JSON.stringify(monitorsAdded)}`);
-        fs.writeFileSync(`list-of-monitors-added-${Date.now()}.json`, JSON.stringify(monitorsAdded, null, 2))
+        writeToListOfMonitorsAddedFile(monitorsAdded)
 
         if (oldMonitorIDWithoutParent in monitorsAdded) {
             continue
@@ -180,7 +184,7 @@ function addMonitorsWithOutParent(oldMonitorIDsWithoutParent, oldMonitorIDsWithT
                 addMonitorsWithParent(oldMonitorIDWithoutParent, oldMonitorIDsWithTheirChildren)
 
                 console.log(`updated monitors added: ${JSON.stringify(monitorsAdded)}`);
-                fs.writeFileSync(`list-of-monitors-added-${Date.now()}.json`, JSON.stringify(monitorsAdded, null, 2))
+                writeToListOfMonitorsAddedFile(monitorsAdded)
             } else {
                 throw new Error(`error adding monitor! response: ${JSON.stringify(response, null, 2)}`);
             }
@@ -192,6 +196,7 @@ function addMonitorsWithParent(oldMonitorIDOfTheParentToLookFor, oldMonitorIDsWi
     const oldMonitorIDsOfTheChildrenOfTheParent = oldMonitorIDsWithTheirChildren[oldMonitorIDOfTheParentToLookFor]
     for (const oldMonitorID of oldMonitorIDsOfTheChildrenOfTheParent) {
         console.log(`current monitors added: ${JSON.stringify(monitorsAdded)}`);
+        writeToListOfMonitorsAddedFile(monitorsAdded)
 
         if (oldMonitorID in monitorsAdded) {
             continue
@@ -236,6 +241,7 @@ function addMonitorsWithParent(oldMonitorIDOfTheParentToLookFor, oldMonitorIDsWi
                 addMonitorsWithParent(oldMonitorID, oldMonitorIDsWithTheirChildren)
 
                 console.log(`updated monitors added: ${JSON.stringify(monitorsAdded)}`);
+                writeToListOfMonitorsAddedFile(monitorsAdded)
             }
         })
     }
