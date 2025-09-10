@@ -1,6 +1,7 @@
 list*.json
 node_modules
 *all-monitors*.json
+status-page-slugs*.json
 
 # any kubernetes pod stuff
 *pod*/
