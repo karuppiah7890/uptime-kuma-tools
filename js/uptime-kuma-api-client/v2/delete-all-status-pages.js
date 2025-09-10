@@ -27,7 +27,7 @@ socket.on("statusPageList", (statusPages) => {
                 console.log(`deleted slug ${statusPageSlug} successfully: ${JSON.stringify(response)}`);
             } else {
                 console.log(`slug ${statusPageSlug} deletion failed. response: ${JSON.stringify(response)}`);
-                throw Error(`slug ${statusPageSlug} deletion failed. response: ${JSON.stringify(response)}`)
+                throw new Error(`slug ${statusPageSlug} deletion failed. response: ${JSON.stringify(response)}`)
             }
         })
     }

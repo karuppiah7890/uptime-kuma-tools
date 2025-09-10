@@ -147,7 +147,7 @@ function TestGetMonitorsAndTheirParents() {
         const output = getMonitorsAndTheirParents(testCase.input)
 
         if (!getMonitorsAndTheirParentsOutputDeepEqualIgnoringArrayOrder(output, testCase.expectedOutput)) {
-            throw Error(`Failure in test case index: ${testCaseIndex}`)
+            throw new Error(`Failure in test case index: ${testCaseIndex}`)
         }
     }
 }
