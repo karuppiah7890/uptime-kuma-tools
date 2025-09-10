@@ -21,6 +21,30 @@ const statusPageSlugsWithMonitorGroups = {
     staging: [],
 }
 
+const aliasNameMapping = {
+    // top level path / status page slug aliases
+    stage: "staging",
+    staging: "stage",
+
+    // second level path / group name aliases
+    developertools: "devlopertools",
+    devlopertools: "developertools",
+}
+
+const preferredNameFor = {
+    // top level path / status page slug preferred names
+    stage: "staging",
+
+    // second level path / group name preferred names
+    devlopertools: "Developer Tools",
+    mongo: "Mongo DB",
+    redis: "Redis",
+    elasticsearch: "Elastic Search",
+    events: "Kafka",
+    rmq: "RabbitMQ",
+    others: "Others"
+}
+
 const statusPageSlugs = Object.keys(statusPageSlugsWithMonitorGroups)
 
 const topLevelPathsToConsider = statusPageSlugs
@@ -61,14 +85,14 @@ socket.on("monitorList", (monitors) => {
 
         const topLevelPath = monitor.path[0].toLowerCase()
 
-        if (!topLevelPathsToConsider.includes(topLevelPath)) {
+        if (!strinArrayIncludes(topLevelPathsToConsider, topLevelPath)) {
             console.log(`encountered top level path that we don't consider: ${topLevelPath}. monitor id: ${monitorID}`)
             continue
         }
 
         const secondLevelPath = monitor.path[1].toLowerCase()
 
-        if (!secondLevelPathsToConsider.includes(secondLevelPath)) {
+        if (!strinArrayIncludes(secondLevelPathsToConsider, secondLevelPath)) {
             console.log(`encountered second level path that we don't consider: ${secondLevelPath}. monitor id: ${monitorID}`)
             continue
         }
@@ -85,8 +109,8 @@ socket.on("monitorList", (monitors) => {
             }
         }
 
-        const statusPageSlug = topLevelPath
-        const groupName = secondLevelPath
+        const groupName = getPreferredName(secondLevelPath)
+        const statusPageSlug = getPreferredName(topLevelPath)
 
         const monitorGroups = statusPageSlugsWithMonitorGroups[statusPageSlug]
 
@@ -102,6 +126,29 @@ socket.on("monitorList", (monitors) => {
     console.log(`Status Page Slugs With Monitor Groups is: ${JSON.stringify(statusPageSlugsWithMonitorGroups)}`)
     fs.writeFileSync(`status-page-slugs-with-monitor-groups-${Date.now()}.json`, JSON.stringify(statusPageSlugsWithMonitorGroups, null, 2))
 })
+
+function getPreferredName(name) {
+    if (name in preferredNameFor) {
+        return preferredNameFor[name]
+    }
+
+    return name
+}
+
+function strinArrayIncludes(stringArray, elementToLookFor) {
+    if (stringArray.includes(elementToLookFor)) {
+        return true
+    }
+
+    if (elementToLookFor in aliasNameMapping) {
+        const aliasNameOfElementToLookFor = aliasNameMapping[elementToLookFor]
+        if (stringArray.includes(aliasNameOfElementToLookFor)) {
+            return true
+        }
+    }
+
+    return false
+}
 
 function findGroupIndex(monitorGroups, groupName) {
     let groupIndex = null
