@@ -118,15 +118,7 @@ const statusPagesToSave = [
   }
 ]
 
-const statusPagesWithMonitorGroups = {
-    incrm: [],
-    tatacrm: [],
-    eucrm: [],
-    uscrm: [],
-    asiacrm: [],
-    nightly: [],
-    staging: [],
-}
+const statusPageSlugsWithMonitorGroups = JSON.parse(String(fs.readFileSync(process.env.UPTIME_KUMA_STATUS_PAGE_SLUGS_WITH_MONITOR_GROUPS_JSON)))
 
 function saveStatusPage(slug, config, imageDataUrl, publicGroupList) {
     return new Promise((resolve, reject) => {
@@ -151,7 +143,7 @@ socket.on("statusPageList", async (statusPages) => {
     for (const statusPage of statusPagesToSave) {
         console.log(`processing status page: ${JSON.stringify(statusPage)}`);
 
-        const publicGroupList = statusPagesWithMonitorGroups[statusPage.slug]
+        const publicGroupList = statusPageSlugsWithMonitorGroups[statusPage.slug]
 
         try {
             await saveStatusPage(statusPage.slug, statusPage, statusPage.logo, publicGroupList)
