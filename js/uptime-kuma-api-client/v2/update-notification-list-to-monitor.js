@@ -8,6 +8,6 @@
 
 //     get the corresponding new monitor given the old monitor ID and the mapping of old monitor ID to new monitor ID
 
-//     modify local new monitor with notifications - using the new notification ID
+//     modify local new monitor with notifications - using the new notification ID. and maybe don't modify any existing notifications?
 //     save the new monitor to uptime kuma
 // }
