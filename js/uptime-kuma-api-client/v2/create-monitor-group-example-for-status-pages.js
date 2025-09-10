@@ -54,7 +54,9 @@ socket.on("monitorList", (monitors) => {
         }
 
         if (monitor.path.length !== 3) {
-            throw new Error(`expected monitor to have path[] array length of 3, but that was not the case for monitor id: ${monitorID}`)
+            // TODO: Ideally we should throw error here, but, for now, we are just logging it so that we can understand the data and clean it
+            console.log(`expected monitor to have path[] array length of 3, but that was not the case for monitor id: ${monitorID}`)
+            continue
         }
 
         const topLevelPath = monitor.path[0].toLowerCase()
