@@ -73,8 +73,18 @@ function getRequestDataForAddMonitorOperation(oldMonitor, parent) {
             expiryNotification,
             ignoreTls,
             authMethod,
+
+            // required for HTTP Basic Auth
             basic_auth_user,
             basic_auth_pass,
+
+            // Just adding these so that all kinds of auth methods are taken care of.
+            // Ideally we need only some of these and NOT all of these. For example,
+            // some are required for one while not the other
+            // - OAuth - OAuth2: Client Credentials
+            // - NTLM
+            // - HTTP Basic Auth
+            // - mTLS
             oauth_client_id,
             oauth_client_secret,
             oauth_token_url,
