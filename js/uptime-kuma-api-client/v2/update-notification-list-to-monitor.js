@@ -59,13 +59,20 @@ function editMonitor(oldMonitorID, correspondingNewMonitor) {
     })
 }
 
+let workStarted = false
+
 // get new monitors list (in v2)
 socket.on("monitorList", async (data) => {
     console.log(`Monitor List is: ${JSON.stringify(data)}`)
     fs.writeFileSync(`list-of-monitors-${Date.now()}.json`, JSON.stringify(data, null, 2))
 
+    if (workStarted) {
+        return
+    }
+
     // iterate through each old monitor
     for (const oldMonitorID in oldMonitors) {
+        workStarted = true
 
         const oldMonitor = oldMonitors[oldMonitorID]
 
