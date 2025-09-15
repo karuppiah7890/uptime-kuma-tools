@@ -1,7 +1,6 @@
 const utils = require('../utils.js')
 const { io } = require("socket.io-client")
 const fs = require('fs')
-const { group } = require('console')
 
 console.log("starting now")
 
