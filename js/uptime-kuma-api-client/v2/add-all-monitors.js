@@ -261,14 +261,14 @@ socket.on("loginRequired", () => {
     console.log(`Server says login is required`)
     utils.login(socket, () => {
         const {
-            oldMonitorIDsWithoutParent,
-            oldMonitorIDsWithTheirChildren,
+            monitorIDsWithoutParent,
+            monitorIDsWithTheirChildren,
         } = getMonitorsAndTheirParents(oldMonitors)
 
-        console.log(oldMonitorIDsWithoutParent);
-        console.log(oldMonitorIDsWithTheirChildren);
+        console.log(monitorIDsWithoutParent);
+        console.log(monitorIDsWithTheirChildren);
 
-        addMonitorsWithOutParent(oldMonitorIDsWithoutParent, oldMonitorIDsWithTheirChildren)
+        addMonitorsWithOutParent(monitorIDsWithoutParent, monitorIDsWithTheirChildren)
     })
 })
 

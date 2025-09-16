@@ -1,28 +1,28 @@
-function getMonitorsAndTheirParents(oldMonitors) {
-    const oldMonitorIDsWithoutParent = []
-    const oldMonitorIDsWithTheirChildren = {}
-    for (const oldMonitorID in oldMonitors) {
-        if (!(oldMonitorID in oldMonitorIDsWithTheirChildren)) {
-            oldMonitorIDsWithTheirChildren[oldMonitorID] = []
+function getMonitorsAndTheirParents(monitors) {
+    const monitorIDsWithoutParent = []
+    const monitorIDsWithTheirChildren = {}
+    for (const monitorID in monitors) {
+        if (!(monitorID in monitorIDsWithTheirChildren)) {
+            monitorIDsWithTheirChildren[monitorID] = []
         }
 
-        const oldMonitor = oldMonitors[oldMonitorID]
+        const monitor = monitors[monitorID]
 
-        if (!oldMonitor.parent) {
-            oldMonitorIDsWithoutParent.push(oldMonitorID)
+        if (!monitor.parent) {
+            monitorIDsWithoutParent.push(monitorID)
             continue
         }
 
-        if (!(oldMonitor.parent in oldMonitorIDsWithTheirChildren)) {
-            oldMonitorIDsWithTheirChildren[oldMonitor.parent] = []
+        if (!(monitor.parent in monitorIDsWithTheirChildren)) {
+            monitorIDsWithTheirChildren[monitor.parent] = []
         }
 
-        oldMonitorIDsWithTheirChildren[oldMonitor.parent].push(oldMonitorID)
+        monitorIDsWithTheirChildren[monitor.parent].push(monitorID)
     }
 
     return {
-        oldMonitorIDsWithoutParent,
-        oldMonitorIDsWithTheirChildren,
+        monitorIDsWithoutParent,
+        monitorIDsWithTheirChildren,
     }
 }
 
