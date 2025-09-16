@@ -67,6 +67,7 @@ socket.on("monitorList", async (data) => {
     fs.writeFileSync(`list-of-monitors-${Date.now()}.json`, JSON.stringify(data, null, 2))
 
     if (workStarted) {
+        console.log("work has already started. we are already updating the notification list in all the monitors");
         return
     }
 
