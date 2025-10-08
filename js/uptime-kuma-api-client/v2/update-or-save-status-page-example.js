@@ -115,6 +115,36 @@ const statusPagesToSave = [
     googleAnalyticsId: null,
     showCertificateExpiry: false,
     autoRefreshInterval: 60
+  },
+  {
+    slug: "seacrm",
+    title: "SEACRM Status Page",
+    description: "",
+    logo: "/icon.svg",
+    theme: "auto",
+    showTags: false,
+    domainNameList: [],
+    customCSS: "body {\n\n\n}\n",
+    footerText: "Capillary Technologies",
+    showPoweredBy: false,
+    googleAnalyticsId: null,
+    showCertificateExpiry: false,
+    autoRefreshInterval: 60
+  },
+  {
+    slug: "ushc-crm",
+    title: "USHC CRM Status Page",
+    description: "",
+    logo: "/icon.svg",
+    theme: "auto",
+    showTags: false,
+    domainNameList: [],
+    customCSS: "body {\n\n\n}\n",
+    footerText: "Capillary Technologies",
+    showPoweredBy: false,
+    googleAnalyticsId: null,
+    showCertificateExpiry: false,
+    autoRefreshInterval: 60
   }
 ]
 

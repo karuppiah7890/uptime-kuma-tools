@@ -18,12 +18,16 @@ const statusPageSlugsWithMonitorGroups = {
     asiacrm: [],
     nightly: [],
     staging: [],
+    seacrm: [],
+    "ushc-crm": []
 }
 
 const aliasNameMapping = {
     // top level path / status page slug aliases
     stage: "staging",
     staging: "stage",
+    ushc: "ushc-crm",
+    "ushc-crm": "ushc",
 
     // second level path / group name aliases
     developertools: "devlopertools",
@@ -33,9 +37,12 @@ const aliasNameMapping = {
 const preferredNameFor = {
     // top level path / status page slug preferred names
     stage: "staging",
+    ushc: "ushc-crm",
+
 
     // second level path / group name preferred names
     devlopertools: "Developer Tools",
+    developertools: "Developer Tools",
     mongo: "Mongo DB",
     redis: "Redis",
     elasticsearch: "Elastic Search",
@@ -122,6 +129,12 @@ socket.on("monitorList", (monitors) => {
         }
     }
 
+    console.log(`Status Page Slugs With Monitor Groups is: ${JSON.stringify(statusPageSlugsWithMonitorGroups)}`)
+    for (const statusPageSlug in statusPageSlugsWithMonitorGroups) {
+        const monitorGroups = statusPageSlugsWithMonitorGroups[statusPageSlug]
+        monitorGroups.sort((group, anotherGroup) => group.name.toLowerCase().localeCompare(anotherGroup.name.toLowerCase()))
+        statusPageSlugsWithMonitorGroups[statusPageSlug] = monitorGroups
+    }
     console.log(`Status Page Slugs With Monitor Groups is: ${JSON.stringify(statusPageSlugsWithMonitorGroups)}`)
     fs.writeFileSync(`status-page-slugs-with-monitor-groups-${Date.now()}.json`, JSON.stringify(statusPageSlugsWithMonitorGroups, null, 2))
 })
