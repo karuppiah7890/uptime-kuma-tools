@@ -250,20 +250,20 @@ for new_deployment_monitor in new_deployment_monitors_to_add:
         # Add the monitor using the provided add_monitor code
 
         api.add_monitor(
-                type=MonitorType.JSON_QUERY,
-                name=new_deployment_monitor,
-                url=url,
-                jsonPath=deployment_monitor_json_path,
-                jsonPathOperator="==",
-                expectedValue="true",
-                interval=60,
-                retryInterval=30,
-                authMethod=AuthMethod.HTTP_BASIC,
-                basic_auth_user="tools-auser",
-                basic_auth_pass=basic_auth_pass,
-                parent=parent,
-                notificationIDList=[1]
-            )
+            type=MonitorType.JSON_QUERY,
+            name=new_deployment_monitor,
+            url=url,
+            jsonPath=deployment_monitor_json_path,
+            jsonPathOperator="==",
+            expectedValue="true",
+            interval=60,
+            retryInterval=30,
+            authMethod=AuthMethod.HTTP_BASIC,
+            basic_auth_user="tools-auser",
+            basic_auth_pass=basic_auth_pass,
+            parent=parent,
+            notificationIDList=[1]
+        )
 
         added_monitors.append(new_deployment_monitor)
     else:
