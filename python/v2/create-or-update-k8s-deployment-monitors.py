@@ -105,9 +105,13 @@ for url, config in url_prefix_mapping.items():
                         valid_substring = False
                     if valid_substring:
                         full_deployment_name = f"{prefix}-{deployment_name}"
-                        if any(monitor['name'] in full_deployment_name for monitor in monitor_info):
-                            existing_deployment_monitors_to_update.append(full_deployment_name)
-                        else:
+                        monitor_found = False
+                        for monitor in monitor_info:
+                            if monitor['name'] in full_deployment_name:
+                                monitor_found = True
+                                existing_deployment_monitors_to_update.append({"name": full_deployment_name, "id": monitor['id']})
+                                break
+                        if not(monitor_found):
                             new_deployment_monitors_to_add.append(full_deployment_name)
 
 # Print the lists of existing and new deployment monitors
@@ -279,9 +283,12 @@ api.login(uptime_kuma_username, uptime_kuma_password)
 
 # Process existing deployment monitors
 for existing_deployment_monitor in existing_deployment_monitors_to_update:
-    print(f"Processing Existing Deployment Monitor: {existing_deployment_monitor}")
-    # Extract prefix from existing_deployment_monitor
-    prefix = existing_deployment_monitor.split("-")[0]
+    existing_deployment_monitor_name = existing_deployment_monitor['name']
+    existing_deployment_monitor_id = existing_deployment_monitor['id']
+    print(f"Processing Existing Deployment Monitor: {existing_deployment_monitor_name}")
+
+    # Extract prefix from existing_deployment_monitor_name
+    prefix = existing_deployment_monitor_name.split("-")[0]
 
     jsonPath = "($count(data.result) = 0) or ($number(data.result[0].value[1]) > 0)"
 
@@ -297,16 +304,17 @@ for existing_deployment_monitor in existing_deployment_monitors_to_update:
 
         # Check if any keyword in parent_info matches the deployment name
         for keyword, parent_value in parent_info.items():
-            if keyword.lower() in existing_deployment_monitor:
+            if keyword.lower() in existing_deployment_monitor_name:
                 parent = parent_value
                 break
         # Replace placeholders in the URL template with deployment name
-        url = url_template.replace("<deployment>", existing_deployment_monitor[len(prefix) + 1:])
+        url = url_template.replace("<deployment>", existing_deployment_monitor_name[len(prefix) + 1:])
 
         print("Updating/Editing Existing Deployment Monitor:")
         print({
+            "id": existing_deployment_monitor_id,
             "type":MonitorType.JSON_QUERY,
-            "name":existing_deployment_monitor,
+            "name":existing_deployment_monitor_name,
             "url":url,
             "jsonPath":jsonPath,
             "jsonPathOperator":"==",
@@ -323,8 +331,9 @@ for existing_deployment_monitor in existing_deployment_monitors_to_update:
         # Update the deployment monitor using the provided edit_monitor code
 
         api.edit_monitor(
+            existing_deployment_monitor_id,
             type=MonitorType.JSON_QUERY,
-            name=existing_deployment_monitor,
+            name=existing_deployment_monitor_name,
             url=url,
             jsonPath=jsonPath,
             jsonPathOperator="==",
@@ -338,7 +347,7 @@ for existing_deployment_monitor in existing_deployment_monitors_to_update:
             notificationIDList=[1]
         )
 
-        updated_monitors.append(existing_deployment_monitor)
+        updated_monitors.append(existing_deployment_monitor_name)
     else:
         print(f"No information found for prefix: {prefix}")
 

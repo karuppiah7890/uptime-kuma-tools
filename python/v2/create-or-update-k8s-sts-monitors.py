@@ -107,9 +107,13 @@ for url, config in url_prefix_mapping.items():
                         valid_substring = False
                     if valid_substring:
                         full_statefulset_name = f"{prefix}-{statefulset_name}"
-                        if any(monitor['name'] in full_statefulset_name for monitor in monitor_info):
-                            existing_statefulset_monitors_to_update.append(full_statefulset_name)
-                        else:
+                        monitor_found = False
+                        for monitor in monitor_info:
+                            if monitor['name'] in full_statefulset_name:
+                                monitor_found = True
+                                existing_statefulset_monitors_to_update.append({"name": full_statefulset_name, "id": monitor['id']})
+                                break
+                        if not(monitor_found):
                             new_statefulset_monitors_to_add.append(full_statefulset_name)
 
 # Print the lists of existing and new statefulset monitors
@@ -331,13 +335,15 @@ api.login(uptime_kuma_username, uptime_kuma_password)
 
 # Process existing statefulset monitors
 for existing_statefulset_monitor in existing_statefulset_monitors_to_update:
-    print(f"Processing Existing StatefulSet Monitor: {existing_statefulset_monitor}")
+    existing_statefulset_monitor_name = existing_statefulset_monitor['name']
+    existing_statefulset_monitor_id = existing_statefulset_monitor['id']
+    print(f"Processing Existing StatefulSet Monitor: {existing_statefulset_monitor_name}")
 
-    # Extract prefix from existing_statefulset_monitor
-    prefix = existing_statefulset_monitor.split("-")[0]
+    # Extract prefix from existing_statefulset_monitor_name
+    prefix = existing_statefulset_monitor_name.split("-")[0]
 
     # Determine jsonPath value based on presence of specific words
-    if any(word in existing_statefulset_monitor for word in jsonPath_words):
+    if any(word in existing_statefulset_monitor_name for word in jsonPath_words):
         jsonPath = "($number(data.result[1]) in [0 ,1])"
     else:
         jsonPath = "($number(data.result[1]) = 0)"
@@ -354,16 +360,17 @@ for existing_statefulset_monitor in existing_statefulset_monitors_to_update:
 
         # Check if any keyword in parent_info matches the statefulset name
         for keyword, parent_value in parent_info.items():
-            if keyword.lower() in existing_statefulset_monitor:
+            if keyword.lower() in existing_statefulset_monitor_name:
                 parent = parent_value
                 break
         # Replace placeholders in the URL template with statefulset name
-        url = url_template.replace("<statefulset>", existing_statefulset_monitor[len(prefix) + 1:])
+        url = url_template.replace("<statefulset>", existing_statefulset_monitor_name[len(prefix) + 1:])
 
         print("Updating/Editing Existing StatefulSet Monitor:")
         print({
+            "id": existing_statefulset_monitor_id,
             "type":MonitorType.JSON_QUERY,
-            "name":existing_statefulset_monitor,
+            "name":existing_statefulset_monitor_name,
             "url":url,
             "jsonPath":jsonPath,
             "jsonPathOperator":"==",
@@ -380,8 +387,9 @@ for existing_statefulset_monitor in existing_statefulset_monitors_to_update:
         # Edit the statefulset monitor using the provided edit_monitor code
 
         api.edit_monitor(
+                existing_statefulset_monitor_id,
                 type=MonitorType.JSON_QUERY,
-                name=existing_statefulset_monitor,
+                name=existing_statefulset_monitor_name,
                 url=url,
                 jsonPath=jsonPath,
                 jsonPathOperator="==",
@@ -395,7 +403,7 @@ for existing_statefulset_monitor in existing_statefulset_monitors_to_update:
                 notificationIDList=[1]
             )
 
-        updated_monitors.append(existing_statefulset_monitor)
+        updated_monitors.append(existing_statefulset_monitor_name)
     else:
         print(f"No information found for prefix: {prefix}")
 
