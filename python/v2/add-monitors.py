@@ -3,6 +3,7 @@
 
 import requests
 import os
+import base64
 from uptime_kuma_api import UptimeKumaApi, MonitorType, AuthMethod
 
 uptime_kuma_uri = os.environ['UPTIME_KUMA_URI']
@@ -18,11 +19,34 @@ api.disconnect()  # Disconnect from the Uptime Kuma API
 # Get monitor names and IDs from Uptime Kuma API
 monitor_info = [{'name': monitor['name'], 'id': monitor['id']} for monitor in monitors]
 
-# Dictionary containing URLs and their corresponding prefixes
 url_prefix_mapping = {
     "https://prometheus.tools-a-crm-seacrm.cc.capillarytech.com/api/v1/query?query=kube_statefulset_labels": {
         "prefix": "seacrm",
-        "auth_prefix": os.environ['SEACRM_TOOLS_USER_AUTH']
+        "basic_auth_pass": os.environ['SEACRM_TOOLS_USER_PASSWORD']
+    },
+    "https://prometheus.tools-a-crm-incrm.cc.capillarytech.com/api/v1/query?query=kube_statefulset_labels": {
+        "prefix": "incrm",
+        "basic_auth_pass": os.environ['INCRM_TOOLS_USER_PASSWORD']
+    },
+    "https://prometheus.tools-a-crm-eucrm.cc.capillarytech.com/api/v1/query?query=kube_statefulset_labels": {
+        "prefix": "eucrm",
+        "basic_auth_pass": os.environ['EUCRM_TOOLS_USER_PASSWORD']
+    },
+    "https://prometheus.tools-a-crm-asiacrm.cc.capillarytech.com/api/v1/query?query=kube_statefulset_labels": {
+        "prefix": "asiacrm",
+        "basic_auth_pass": os.environ['ASIACRM_TOOLS_USER_PASSWORD']
+    },
+    "https://prometheus.tools-a-crm-tatacrm.cc.capillarytech.com/api/v1/query?query=kube_statefulset_labels": {
+        "prefix": "tatacrm",
+        "basic_auth_pass": os.environ['TATACRM_TOOLS_USER_PASSWORD']
+    },
+    "https://prometheus.tools-a-crm-uscrm.cc.capillarytech.com/api/v1/query?query=kube_statefulset_labels": {
+        "prefix": "uscrm",
+        "basic_auth_pass": os.environ['USCRM_TOOLS_USER_PASSWORD']
+    },
+    "https://prometheus.tools-a-crm-ushc-crm.cc.capillarytech.com/api/v1/query?query=kube_statefulset_labels": {
+        "prefix": "ushc",
+        "basic_auth_pass": os.environ['USHC_CRM_TOOLS_USER_PASSWORD']
     },
     # Add more URL-prefix pairs here
 }
@@ -49,7 +73,11 @@ non_matching_statefulsets = []
 # Process each URL
 for url, config in url_prefix_mapping.items():
     prefix = config.get("prefix", "")
-    auth_prefix = config.get("auth_prefix")
+    basic_auth_pass = config.get("basic_auth_pass")
+    basic_auth = f"tools-auser:{basic_auth_pass}"
+    basic_auth_bytes = basic_auth.encode("utf-8")
+    auth_prefix_bytes = base64.b64encode(basic_auth_bytes)
+    auth_prefix = auth_prefix_bytes.decode("utf-8")
 
     headers = {
         "Content-Type": "application/json",
@@ -108,6 +136,102 @@ prefix_info = {
             "zk-": os.environ['SEACRM_OTHERS_PARENT'],
             "emigran": os.environ['SEACRM_OTHERS_PARENT'],
             "neo4j": os.environ['SEACRM_OTHERS_PARENT'],
+        }
+    },
+    "incrm": {
+        "url": "https://prometheus.tools-a-crm-incrm.cc.capillarytech.com/api/v1/query?query=scalar(kube_statefulset_status_replicas_ready{statefulset=\"<statefulset>\"} == kube_statefulset_replicas{statefulset=\"<statefulset>\"})",
+        "basic_auth_pass": os.environ['INCRM_TOOLS_USER_PASSWORD'],
+        "parent": {
+            "redis": os.environ['INCRM_REDIS_PARENT'],
+            "mongo": os.environ['INCRM_MONGO_PARENT'],
+            "rmq" : os.environ['INCRM_RABBITMQ_PARENT'],
+            "elasticsearch": os.environ['INCRM_ELASTICSEARCH_PARENT'],
+            "events": os.environ['INCRM_KAFKA_PARENT'],
+            "ptmysqlhotswap": os.environ['INCRM_DEVELOPER_TOOLS_PARENT'],
+            "wetty": os.environ['INCRM_DEVELOPER_TOOLS_PARENT'],
+            "zk-": os.environ['INCRM_OTHERS_PARENT'],
+            "emigran": os.environ['INCRM_OTHERS_PARENT'],
+            "neo4j": os.environ['INCRM_OTHERS_PARENT'],
+        }
+    },
+    "eucrm": {
+        "url": "https://prometheus.tools-a-crm-eucrm.cc.capillarytech.com/api/v1/query?query=scalar(kube_statefulset_status_replicas_ready{statefulset=\"<statefulset>\"} == kube_statefulset_replicas{statefulset=\"<statefulset>\"})",
+        "basic_auth_pass": os.environ['EUCRM_TOOLS_USER_PASSWORD'],
+        "parent": {
+            "redis": os.environ['EUCRM_REDIS_PARENT'],
+            "mongo": os.environ['EUCRM_MONGO_PARENT'],
+            "rmq" : os.environ['EUCRM_RABBITMQ_PARENT'],
+            "elasticsearch": os.environ['EUCRM_ELASTICSEARCH_PARENT'],
+            "events": os.environ['EUCRM_KAFKA_PARENT'],
+            "ptmysqlhotswap": os.environ['EUCRM_DEVELOPER_TOOLS_PARENT'],
+            "wetty": os.environ['EUCRM_DEVELOPER_TOOLS_PARENT'],
+            "zk-": os.environ['EUCRM_OTHERS_PARENT'],
+            "emigran": os.environ['EUCRM_OTHERS_PARENT'],
+            "neo4j": os.environ['EUCRM_OTHERS_PARENT'],
+        }
+    },
+    "asiacrm": {
+        "url": "https://prometheus.tools-a-crm-asiacrm.cc.capillarytech.com/api/v1/query?query=scalar(kube_statefulset_status_replicas_ready{statefulset=\"<statefulset>\"} == kube_statefulset_replicas{statefulset=\"<statefulset>\"})",
+        "basic_auth_pass": os.environ['ASIACRM_TOOLS_USER_PASSWORD'],
+        "parent": {
+            "redis": os.environ['ASIACRM_REDIS_PARENT'],
+            "mongo": os.environ['ASIACRM_MONGO_PARENT'],
+            "rmq" : os.environ['ASIACRM_RABBITMQ_PARENT'],
+            "elasticsearch": os.environ['ASIACRM_ELASTICSEARCH_PARENT'],
+            "events": os.environ['ASIACRM_KAFKA_PARENT'],
+            "ptmysqlhotswap": os.environ['ASIACRM_DEVELOPER_TOOLS_PARENT'],
+            "wetty": os.environ['ASIACRM_DEVELOPER_TOOLS_PARENT'],
+            "zk-": os.environ['ASIACRM_OTHERS_PARENT'],
+            "emigran": os.environ['ASIACRM_OTHERS_PARENT'],
+            "neo4j": os.environ['ASIACRM_OTHERS_PARENT'],
+        }
+    },
+    "tatacrm": {
+        "url": "https://prometheus.tools-a-crm-tatacrm.cc.capillarytech.com/api/v1/query?query=scalar(kube_statefulset_status_replicas_ready{statefulset=\"<statefulset>\"} == kube_statefulset_replicas{statefulset=\"<statefulset>\"})",
+        "basic_auth_pass": os.environ['TATACRM_TOOLS_USER_PASSWORD'],
+        "parent": {
+            "redis": os.environ['TATACRM_REDIS_PARENT'],
+            "mongo": os.environ['TATACRM_MONGO_PARENT'],
+            "rmq" : os.environ['TATACRM_RABBITMQ_PARENT'],
+            "elasticsearch": os.environ['TATACRM_ELASTICSEARCH_PARENT'],
+            "events": os.environ['TATACRM_KAFKA_PARENT'],
+            "ptmysqlhotswap": os.environ['TATACRM_DEVELOPER_TOOLS_PARENT'],
+            "wetty": os.environ['TATACRM_DEVELOPER_TOOLS_PARENT'],
+            "zk-": os.environ['TATACRM_OTHERS_PARENT'],
+            "emigran": os.environ['TATACRM_OTHERS_PARENT'],
+            "neo4j": os.environ['TATACRM_OTHERS_PARENT'],
+        }
+    },
+    "uscrm": {
+        "url": "https://prometheus.tools-a-crm-uscrm.cc.capillarytech.com/api/v1/query?query=scalar(kube_statefulset_status_replicas_ready{statefulset=\"<statefulset>\"} == kube_statefulset_replicas{statefulset=\"<statefulset>\"})",
+        "basic_auth_pass": os.environ['USCRM_TOOLS_USER_PASSWORD'],
+        "parent": {
+            "redis": os.environ['USCRM_REDIS_PARENT'],
+            "mongo": os.environ['USCRM_MONGO_PARENT'],
+            "rmq" : os.environ['USCRM_RABBITMQ_PARENT'],
+            "elasticsearch": os.environ['USCRM_ELASTICSEARCH_PARENT'],
+            "events": os.environ['USCRM_KAFKA_PARENT'],
+            "ptmysqlhotswap": os.environ['USCRM_DEVELOPER_TOOLS_PARENT'],
+            "wetty": os.environ['USCRM_DEVELOPER_TOOLS_PARENT'],
+            "zk-": os.environ['USCRM_OTHERS_PARENT'],
+            "emigran": os.environ['USCRM_OTHERS_PARENT'],
+            "neo4j": os.environ['USCRM_OTHERS_PARENT'],
+        }
+    },
+    "ushc": {
+        "url": "https://prometheus.tools-a-crm-ushc-crm.cc.capillarytech.com/api/v1/query?query=scalar(kube_statefulset_status_replicas_ready{statefulset=\"<statefulset>\"} == kube_statefulset_replicas{statefulset=\"<statefulset>\"})",
+        "basic_auth_pass": os.environ['USHC_CRM_TOOLS_USER_PASSWORD'],
+        "parent": {
+            "redis": os.environ['USHC_CRM_REDIS_PARENT'],
+            "mongo": os.environ['USHC_CRM_MONGO_PARENT'],
+            "rmq" : os.environ['USHC_CRM_RABBITMQ_PARENT'],
+            "elasticsearch": os.environ['USHC_CRM_ELASTICSEARCH_PARENT'],
+            "events": os.environ['USHC_CRM_KAFKA_PARENT'],
+            "ptmysqlhotswap": os.environ['USHC_CRM_DEVELOPER_TOOLS_PARENT'],
+            "wetty": os.environ['USHC_CRM_DEVELOPER_TOOLS_PARENT'],
+            "zk-": os.environ['USHC_CRM_OTHERS_PARENT'],
+            "emigran": os.environ['USHC_CRM_OTHERS_PARENT'],
+            "neo4j": os.environ['USHC_CRM_OTHERS_PARENT'],
         }
     },
     # Add more prefix information as needed
