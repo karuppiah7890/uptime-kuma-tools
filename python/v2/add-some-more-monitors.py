@@ -226,7 +226,6 @@ for non_matching_deployment in non_matching_deployments:
         # Replace placeholders in the URL template with deployment name
         url = url_template.replace("<deployment>", non_matching_deployment[len(prefix) + 1:])
 
-
         print("Adding Monitor:")
         print({
             "type":MonitorType.JSON_QUERY,
