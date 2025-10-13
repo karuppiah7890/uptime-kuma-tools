@@ -277,7 +277,7 @@ updated_monitors = []
 api = UptimeKumaApi(url=uptime_kuma_uri, timeout=600)
 api.login(uptime_kuma_username, uptime_kuma_password)
 
-# Process existing deployments
+# Process existing deployment monitors
 for existing_deployment_monitor in existing_deployment_monitors_to_update:
     print(f"Processing Existing Deployment Monitor: {existing_deployment_monitor}")
     # Extract prefix from existing_deployment_monitor
