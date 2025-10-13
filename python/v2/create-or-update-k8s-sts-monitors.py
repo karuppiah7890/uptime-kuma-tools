@@ -128,7 +128,7 @@ for new_statefulset_monitor in new_statefulset_monitors_to_add:
 # Dictionary to store information based on prefixes
 prefix_info = {
     "seacrm": {
-        "url": "https://prometheus.tools-a-crm-seacrm.cc.capillarytech.com/api/v1/query?query=scalar(kube_statefulset_status_replicas_ready{statefulset=\"<statefulset>\"} == kube_statefulset_replicas{statefulset=\"<statefulset>\"})",
+        "url": "https://prometheus.tools-a-crm-seacrm.cc.capillarytech.com/api/v1/query?query=kube_statefulset_status_replicas_ready{statefulset=\"<statefulset>\"} != kube_statefulset_replicas{statefulset=\"<statefulset>\"}",
         "basic_auth_pass": os.environ['SEACRM_TOOLS_USER_PASSWORD'],
         "parent": {
             "redis": os.environ['SEACRM_REDIS_PARENT'],
@@ -144,7 +144,7 @@ prefix_info = {
         }
     },
     "incrm": {
-        "url": "https://prometheus.tools-a-crm-incrm.cc.capillarytech.com/api/v1/query?query=scalar(kube_statefulset_status_replicas_ready{statefulset=\"<statefulset>\"} == kube_statefulset_replicas{statefulset=\"<statefulset>\"})",
+        "url": "https://prometheus.tools-a-crm-incrm.cc.capillarytech.com/api/v1/query?query=kube_statefulset_status_replicas_ready{statefulset=\"<statefulset>\"} != kube_statefulset_replicas{statefulset=\"<statefulset>\"}",
         "basic_auth_pass": os.environ['INCRM_TOOLS_USER_PASSWORD'],
         "parent": {
             "redis": os.environ['INCRM_REDIS_PARENT'],
@@ -160,7 +160,7 @@ prefix_info = {
         }
     },
     "eucrm": {
-        "url": "https://prometheus.tools-a-crm-eucrm.cc.capillarytech.com/api/v1/query?query=scalar(kube_statefulset_status_replicas_ready{statefulset=\"<statefulset>\"} == kube_statefulset_replicas{statefulset=\"<statefulset>\"})",
+        "url": "https://prometheus.tools-a-crm-eucrm.cc.capillarytech.com/api/v1/query?query=kube_statefulset_status_replicas_ready{statefulset=\"<statefulset>\"} != kube_statefulset_replicas{statefulset=\"<statefulset>\"}",
         "basic_auth_pass": os.environ['EUCRM_TOOLS_USER_PASSWORD'],
         "parent": {
             "redis": os.environ['EUCRM_REDIS_PARENT'],
@@ -176,7 +176,7 @@ prefix_info = {
         }
     },
     "asiacrm": {
-        "url": "https://prometheus.tools-a-crm-asiacrm.cc.capillarytech.com/api/v1/query?query=scalar(kube_statefulset_status_replicas_ready{statefulset=\"<statefulset>\"} == kube_statefulset_replicas{statefulset=\"<statefulset>\"})",
+        "url": "https://prometheus.tools-a-crm-asiacrm.cc.capillarytech.com/api/v1/query?query=kube_statefulset_status_replicas_ready{statefulset=\"<statefulset>\"} != kube_statefulset_replicas{statefulset=\"<statefulset>\"}",
         "basic_auth_pass": os.environ['ASIACRM_TOOLS_USER_PASSWORD'],
         "parent": {
             "redis": os.environ['ASIACRM_REDIS_PARENT'],
@@ -192,7 +192,7 @@ prefix_info = {
         }
     },
     "tatacrm": {
-        "url": "https://prometheus.tools-a-crm-tatacrm.cc.capillarytech.com/api/v1/query?query=scalar(kube_statefulset_status_replicas_ready{statefulset=\"<statefulset>\"} == kube_statefulset_replicas{statefulset=\"<statefulset>\"})",
+        "url": "https://prometheus.tools-a-crm-tatacrm.cc.capillarytech.com/api/v1/query?query=kube_statefulset_status_replicas_ready{statefulset=\"<statefulset>\"} != kube_statefulset_replicas{statefulset=\"<statefulset>\"}",
         "basic_auth_pass": os.environ['TATACRM_TOOLS_USER_PASSWORD'],
         "parent": {
             "redis": os.environ['TATACRM_REDIS_PARENT'],
@@ -208,7 +208,7 @@ prefix_info = {
         }
     },
     "uscrm": {
-        "url": "https://prometheus.tools-a-crm-uscrm.cc.capillarytech.com/api/v1/query?query=scalar(kube_statefulset_status_replicas_ready{statefulset=\"<statefulset>\"} == kube_statefulset_replicas{statefulset=\"<statefulset>\"})",
+        "url": "https://prometheus.tools-a-crm-uscrm.cc.capillarytech.com/api/v1/query?query=kube_statefulset_status_replicas_ready{statefulset=\"<statefulset>\"} != kube_statefulset_replicas{statefulset=\"<statefulset>\"}",
         "basic_auth_pass": os.environ['USCRM_TOOLS_USER_PASSWORD'],
         "parent": {
             "redis": os.environ['USCRM_REDIS_PARENT'],
@@ -224,7 +224,7 @@ prefix_info = {
         }
     },
     "ushc": {
-        "url": "https://prometheus.tools-a-crm-ushc-crm.cc.capillarytech.com/api/v1/query?query=scalar(kube_statefulset_status_replicas_ready{statefulset=\"<statefulset>\"} == kube_statefulset_replicas{statefulset=\"<statefulset>\"})",
+        "url": "https://prometheus.tools-a-crm-ushc-crm.cc.capillarytech.com/api/v1/query?query=kube_statefulset_status_replicas_ready{statefulset=\"<statefulset>\"} != kube_statefulset_replicas{statefulset=\"<statefulset>\"}",
         "basic_auth_pass": os.environ['USHC_CRM_TOOLS_USER_PASSWORD'],
         "parent": {
             "redis": os.environ['USHC_CRM_REDIS_PARENT'],
@@ -242,9 +242,7 @@ prefix_info = {
     # Add more prefix information as needed
 }
 
-# List of words to check for in new_statefulset_monitor name
-jsonPath_words = ["events-", "elasticsearch-", "zk-"]
-
+statefulset_monitor_json_path = "($count(data.result) = 0)"
 
 # List to store added monitors
 added_monitors = []
@@ -257,12 +255,6 @@ for new_statefulset_monitor in new_statefulset_monitors_to_add:
 
     # Extract prefix from new_statefulset_monitor
     prefix = new_statefulset_monitor.split("-")[0]
-
-    # Determine jsonPath value based on presence of specific words
-    if any(word in new_statefulset_monitor for word in jsonPath_words):
-        jsonPath = "($number(data.result[1]) in [0 ,1])"
-    else:
-        jsonPath = "($number(data.result[1]) = 0)"
 
     # Check if prefix information is available
     if prefix in prefix_info:
@@ -287,9 +279,9 @@ for new_statefulset_monitor in new_statefulset_monitors_to_add:
             "type":MonitorType.JSON_QUERY,
             "name":new_statefulset_monitor,
             "url":url,
-            "jsonPath":jsonPath,
+            "jsonPath":statefulset_monitor_json_path,
             "jsonPathOperator":"==",
-            "expectedValue":"false",
+            "expectedValue":"true",
             "interval":60,
             "retryInterval":30,
             "authMethod":AuthMethod.HTTP_BASIC,
@@ -305,9 +297,9 @@ for new_statefulset_monitor in new_statefulset_monitors_to_add:
                 type=MonitorType.JSON_QUERY,
                 name=new_statefulset_monitor,
                 url=url,
-                jsonPath=jsonPath,
+                jsonPath=statefulset_monitor_json_path,
                 jsonPathOperator="==",
-                expectedValue="false",
+                expectedValue="true",
                 interval=60,
                 retryInterval=30,
                 authMethod=AuthMethod.HTTP_BASIC,
@@ -342,12 +334,6 @@ for existing_statefulset_monitor in existing_statefulset_monitors_to_update:
     # Extract prefix from existing_statefulset_monitor_name
     prefix = existing_statefulset_monitor_name.split("-")[0]
 
-    # Determine jsonPath value based on presence of specific words
-    if any(word in existing_statefulset_monitor_name for word in jsonPath_words):
-        jsonPath = "($number(data.result[1]) in [0 ,1])"
-    else:
-        jsonPath = "($number(data.result[1]) = 0)"
-
     # Check if prefix information is available
     if prefix in prefix_info:
         prefix_data = prefix_info[prefix]
@@ -372,9 +358,9 @@ for existing_statefulset_monitor in existing_statefulset_monitors_to_update:
             "type":MonitorType.JSON_QUERY,
             "name":existing_statefulset_monitor_name,
             "url":url,
-            "jsonPath":jsonPath,
+            "jsonPath":statefulset_monitor_json_path,
             "jsonPathOperator":"==",
-            "expectedValue":"false",
+            "expectedValue":"true",
             "interval":60,
             "retryInterval":30,
             "authMethod":AuthMethod.HTTP_BASIC,
@@ -391,9 +377,9 @@ for existing_statefulset_monitor in existing_statefulset_monitors_to_update:
                 type=MonitorType.JSON_QUERY,
                 name=existing_statefulset_monitor_name,
                 url=url,
-                jsonPath=jsonPath,
+                jsonPath=statefulset_monitor_json_path,
                 jsonPathOperator="==",
-                expectedValue="false",
+                expectedValue="true",
                 interval=60,
                 retryInterval=30,
                 authMethod=AuthMethod.HTTP_BASIC,
