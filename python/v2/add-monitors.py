@@ -68,7 +68,7 @@ filter_conditions = [
 
 # In-memory lists to store valid statefulset names
 existing_statefulsets = []
-new_statefulset_to_add = []
+new_statefulsets_to_add = []
 
 # Process each URL
 for url, config in url_prefix_mapping.items():
@@ -110,7 +110,7 @@ for url, config in url_prefix_mapping.items():
                         if any(monitor['name'] in full_statefulset_name for monitor in monitor_info):
                             existing_statefulsets.append(full_statefulset_name)
                         else:
-                            new_statefulset_to_add.append(full_statefulset_name)
+                            new_statefulsets_to_add.append(full_statefulset_name)
 
 # Print the lists of existing and new statefulsets
 print("Existing StatefulSets:")
@@ -118,7 +118,7 @@ for existing_statefulset in existing_statefulsets:
     print(existing_statefulset)
 
 print("\nNew StatefulSets:")
-for new_statefulset in new_statefulset_to_add:
+for new_statefulset in new_statefulsets_to_add:
     print(new_statefulset)
 
 # Dictionary to store information based on prefixes
@@ -248,7 +248,7 @@ api = UptimeKumaApi(url=uptime_kuma_uri, timeout=600)
 api.login(uptime_kuma_username, uptime_kuma_password)
 
 # Process new statefulsets
-for new_statefulset in new_statefulset_to_add:
+for new_statefulset in new_statefulsets_to_add:
     print(f"Processing New StatefulSet: {new_statefulset}")
 
     # Extract prefix from new_statefulset
