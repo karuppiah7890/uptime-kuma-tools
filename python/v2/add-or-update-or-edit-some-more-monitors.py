@@ -63,8 +63,8 @@ filter_conditions = [
 ]
 
 # In-memory lists to store valid deployment names
-matching_deployments = []
-non_matching_deployments = []
+existing_deployments_to_update = []
+new_deployments_to_add = []
 
 print("Processing names of all deployments")
 
@@ -106,18 +106,18 @@ for url, config in url_prefix_mapping.items():
                     if valid_substring:
                         full_deployment_name = f"{prefix}-{deployment_name}"
                         if any(monitor['name'] in full_deployment_name for monitor in monitor_info):
-                            matching_deployments.append(full_deployment_name)
+                            existing_deployments_to_update.append(full_deployment_name)
                         else:
-                            non_matching_deployments.append(full_deployment_name)
+                            new_deployments_to_add.append(full_deployment_name)
 
-# Print the lists of matching and non-matching deployments
-print("Matching Deployments:")
-for matching_deployment in matching_deployments:
-    print(matching_deployment)
+# Print the lists of existing and new deployments
+print("Existing Deployments:")
+for existing_deployment in existing_deployments_to_update:
+    print(existing_deployment)
 
-print("\nNon-Matching Deployments:")
-for non_matching_deployment in non_matching_deployments:
-    print(non_matching_deployment)
+print("\New Deployments:")
+for new_deployment in new_deployments_to_add:
+    print(new_deployment)
 
 # Dictionary to store information based on prefixes
 prefix_info = {
@@ -200,11 +200,11 @@ added_monitors = []
 api = UptimeKumaApi(url=uptime_kuma_uri, timeout=600)
 api.login(uptime_kuma_username, uptime_kuma_password)
 
-# Process non-matching deployments
-for non_matching_deployment in non_matching_deployments:
-    print(f"Processing Deployment: {non_matching_deployment}")
-    # Extract prefix from non_matching_deployment
-    prefix = non_matching_deployment.split("-")[0]
+# Process new deployments
+for new_deployment in new_deployments_to_add:
+    print(f"Processing New Deployment: {new_deployment}")
+    # Extract prefix from new_deployment
+    prefix = new_deployment.split("-")[0]
 
     jsonPath = "($count(data.result) = 0) or ($number(data.result[0].value[1]) > 0)"
 
@@ -220,16 +220,16 @@ for non_matching_deployment in non_matching_deployments:
 
         # Check if any keyword in parent_info matches the deployment name
         for keyword, parent_value in parent_info.items():
-            if keyword.lower() in non_matching_deployment:
+            if keyword.lower() in new_deployment:
                 parent = parent_value
                 break
         # Replace placeholders in the URL template with deployment name
-        url = url_template.replace("<deployment>", non_matching_deployment[len(prefix) + 1:])
+        url = url_template.replace("<deployment>", new_deployment[len(prefix) + 1:])
 
-        print("Adding Monitor:")
+        print("Adding New Monitor:")
         print({
             "type":MonitorType.JSON_QUERY,
-            "name":non_matching_deployment,
+            "name":new_deployment,
             "url":url,
             "jsonPath":jsonPath,
             "jsonPathOperator":"==",
@@ -247,7 +247,7 @@ for non_matching_deployment in non_matching_deployments:
 
         api.add_monitor(
                 type=MonitorType.JSON_QUERY,
-                name=non_matching_deployment,
+                name=new_deployment,
                 url=url,
                 jsonPath=jsonPath,
                 jsonPathOperator="==",
@@ -261,7 +261,7 @@ for non_matching_deployment in non_matching_deployments:
                 notificationIDList=[1]
             )
 
-        added_monitors.append(non_matching_deployment)
+        added_monitors.append(new_deployment)
     else:
         print(f"No information found for prefix: {prefix}")
 
@@ -277,11 +277,11 @@ updated_monitors = []
 api = UptimeKumaApi(url=uptime_kuma_uri, timeout=600)
 api.login(uptime_kuma_username, uptime_kuma_password)
 
-# Process matching deployments
-for matching_deployment in matching_deployments:
-    print(f"Processing Deployment: {matching_deployment}")
-    # Extract prefix from matching_deployment
-    prefix = matching_deployment.split("-")[0]
+# Process existing deployments
+for existing_deployment in existing_deployments_to_update:
+    print(f"Processing Existing Deployment: {existing_deployment}")
+    # Extract prefix from existing_deployment
+    prefix = existing_deployment.split("-")[0]
 
     jsonPath = "($count(data.result) = 0) or ($number(data.result[0].value[1]) > 0)"
 
@@ -297,16 +297,16 @@ for matching_deployment in matching_deployments:
 
         # Check if any keyword in parent_info matches the deployment name
         for keyword, parent_value in parent_info.items():
-            if keyword.lower() in matching_deployment:
+            if keyword.lower() in existing_deployment:
                 parent = parent_value
                 break
         # Replace placeholders in the URL template with deployment name
-        url = url_template.replace("<deployment>", matching_deployment[len(prefix) + 1:])
+        url = url_template.replace("<deployment>", existing_deployment[len(prefix) + 1:])
 
-        print("Updating Monitor:")
+        print("Updating/Editing Existing Monitor:")
         print({
             "type":MonitorType.JSON_QUERY,
-            "name":matching_deployment,
+            "name":existing_deployment,
             "url":url,
             "jsonPath":jsonPath,
             "jsonPathOperator":"==",
@@ -324,7 +324,7 @@ for matching_deployment in matching_deployments:
 
         api.edit_monitor(
             type=MonitorType.JSON_QUERY,
-            name=matching_deployment,
+            name=existing_deployment,
             url=url,
             jsonPath=jsonPath,
             jsonPathOperator="==",
@@ -338,7 +338,7 @@ for matching_deployment in matching_deployments:
             notificationIDList=[1]
         )
 
-        updated_monitors.append(matching_deployment)
+        updated_monitors.append(existing_deployment)
     else:
         print(f"No information found for prefix: {prefix}")
 
