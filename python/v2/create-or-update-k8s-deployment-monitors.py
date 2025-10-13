@@ -10,7 +10,7 @@ uptime_kuma_uri = os.environ['UPTIME_KUMA_URI']
 uptime_kuma_username = os.environ['UPTIME_KUMA_USERNAME']
 uptime_kuma_password = os.environ['UPTIME_KUMA_PASSWORD']
 
-deployment_monitor_json_path = "($count(data.result) = 0) or ($number(data.result[0].value[1]) > 0)"
+deployment_monitor_json_path = "($count(data.result) = 0)"
 
 # Uptime Kuma API initialization
 api = UptimeKumaApi(url=uptime_kuma_uri, timeout=600)
