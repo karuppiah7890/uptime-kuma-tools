@@ -1,4 +1,4 @@
-# This takes care of adding monitors for deployments in the Kubernetes cluster. It gets it's data about deployments using Prometheus which has
+# This takes care of adding and updating monitors for deployments in the Kubernetes cluster. It gets it's data about deployments using Prometheus which has
 # metrics about the kubernetes clusters. This DOES NOT take care of adding monitors for other resources / resource types - like daemonsets, statefulsets etc
 
 import requests
