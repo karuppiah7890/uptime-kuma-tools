@@ -377,7 +377,7 @@ for existing_statefulset_monitor in existing_statefulset_monitors_to_update:
             "notificationIDList":[1]
         })
 
-        # Add the monitor using the provided add_monitor code
+        # Edit the statefulset monitor using the provided edit_monitor code
 
         api.edit_monitor(
                 type=MonitorType.JSON_QUERY,
