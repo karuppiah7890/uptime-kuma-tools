@@ -67,8 +67,8 @@ filter_conditions = [
 ]
 
 # In-memory lists to store valid statefulset names
-matching_statefulsets = []
-non_matching_statefulsets = []
+existing_statefulsets = []
+new_statefulset_to_add = []
 
 # Process each URL
 for url, config in url_prefix_mapping.items():
@@ -108,18 +108,18 @@ for url, config in url_prefix_mapping.items():
                     if valid_substring:
                         full_statefulset_name = f"{prefix}-{statefulset_name}"
                         if any(monitor['name'] in full_statefulset_name for monitor in monitor_info):
-                            matching_statefulsets.append(full_statefulset_name)
+                            existing_statefulsets.append(full_statefulset_name)
                         else:
-                            non_matching_statefulsets.append(full_statefulset_name)
+                            new_statefulset_to_add.append(full_statefulset_name)
 
-# Print the lists of matching and non-matching statefulsets
-print("Matching StatefulSets:")
-for matching_statefulset in matching_statefulsets:
-    print(matching_statefulset)
+# Print the lists of existing and new statefulsets
+print("Existing StatefulSets:")
+for existing_statefulset in existing_statefulsets:
+    print(existing_statefulset)
 
-print("\nNon-Matching StatefulSets:")
-for non_matching_statefulset in non_matching_statefulsets:
-    print(non_matching_statefulset)
+print("\nNew StatefulSets:")
+for new_statefulset in new_statefulset_to_add:
+    print(new_statefulset)
 
 # Dictionary to store information based on prefixes
 prefix_info = {
@@ -238,7 +238,7 @@ prefix_info = {
     # Add more prefix information as needed
 }
 
-# List of words to check for in non_matching_statefulset name
+# List of words to check for in new_statefulset name
 jsonPath_words = ["events-", "elasticsearch-", "zk-"]
 
 
@@ -247,15 +247,15 @@ added_monitors = []
 api = UptimeKumaApi(url=uptime_kuma_uri, timeout=600)
 api.login(uptime_kuma_username, uptime_kuma_password)
 
-# Process non-matching statefulsets
-for non_matching_statefulset in non_matching_statefulsets:
-    print(f"Processing StatefulSet: {non_matching_statefulset}")
+# Process new statefulsets
+for new_statefulset in new_statefulset_to_add:
+    print(f"Processing New StatefulSet: {new_statefulset}")
 
-    # Extract prefix from non_matching_statefulset
-    prefix = non_matching_statefulset.split("-")[0]
+    # Extract prefix from new_statefulset
+    prefix = new_statefulset.split("-")[0]
 
     # Determine jsonPath value based on presence of specific words
-    if any(word in non_matching_statefulset for word in jsonPath_words):
+    if any(word in new_statefulset for word in jsonPath_words):
         jsonPath = "($number(data.result[1]) in [0 ,1])"
     else:
         jsonPath = "($number(data.result[1]) = 0)"
@@ -272,16 +272,16 @@ for non_matching_statefulset in non_matching_statefulsets:
 
         # Check if any keyword in parent_info matches the statefulset name
         for keyword, parent_value in parent_info.items():
-            if keyword.lower() in non_matching_statefulset:
+            if keyword.lower() in new_statefulset:
                 parent = parent_value
                 break
         # Replace placeholders in the URL template with statefulset name
-        url = url_template.replace("<statefulset>", non_matching_statefulset[len(prefix) + 1:])
+        url = url_template.replace("<statefulset>", new_statefulset[len(prefix) + 1:])
 
-        print("Adding Monitor:")
+        print("Adding New Monitor:")
         print({
             "type":MonitorType.JSON_QUERY,
-            "name":non_matching_statefulset,
+            "name":new_statefulset,
             "url":url,
             "jsonPath":jsonPath,
             "jsonPathOperator":"==",
@@ -299,7 +299,7 @@ for non_matching_statefulset in non_matching_statefulsets:
 
         api.add_monitor(
                 type=MonitorType.JSON_QUERY,
-                name=non_matching_statefulset,
+                name=new_statefulset,
                 url=url,
                 jsonPath=jsonPath,
                 jsonPathOperator="==",
@@ -313,7 +313,7 @@ for non_matching_statefulset in non_matching_statefulsets:
                 notificationIDList=[1]
             )
 
-        added_monitors.append(non_matching_statefulset)
+        added_monitors.append(new_statefulset)
     else:
         print(f"No information found for prefix: {prefix}")
 
