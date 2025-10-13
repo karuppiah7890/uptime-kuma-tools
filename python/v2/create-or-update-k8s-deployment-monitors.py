@@ -10,6 +10,8 @@ uptime_kuma_uri = os.environ['UPTIME_KUMA_URI']
 uptime_kuma_username = os.environ['UPTIME_KUMA_USERNAME']
 uptime_kuma_password = os.environ['UPTIME_KUMA_PASSWORD']
 
+deployment_monitor_json_path = "($count(data.result) = 0) or ($number(data.result[0].value[1]) > 0)"
+
 # Uptime Kuma API initialization
 api = UptimeKumaApi(url=uptime_kuma_uri, timeout=600)
 api.login(uptime_kuma_username, uptime_kuma_password)
@@ -210,8 +212,6 @@ for new_deployment_monitor in new_deployment_monitors_to_add:
     # Extract prefix from new_deployment_monitor
     prefix = new_deployment_monitor.split("-")[0]
 
-    jsonPath = "($count(data.result) = 0) or ($number(data.result[0].value[1]) > 0)"
-
     # Check if prefix information is available
     if prefix in prefix_info:
         prefix_data = prefix_info[prefix]
@@ -235,7 +235,7 @@ for new_deployment_monitor in new_deployment_monitors_to_add:
             "type":MonitorType.JSON_QUERY,
             "name":new_deployment_monitor,
             "url":url,
-            "jsonPath":jsonPath,
+            "jsonPath":deployment_monitor_json_path,
             "jsonPathOperator":"==",
             "expectedValue":"true",
             "interval":60,
@@ -253,7 +253,7 @@ for new_deployment_monitor in new_deployment_monitors_to_add:
                 type=MonitorType.JSON_QUERY,
                 name=new_deployment_monitor,
                 url=url,
-                jsonPath=jsonPath,
+                jsonPath=deployment_monitor_json_path,
                 jsonPathOperator="==",
                 expectedValue="true",
                 interval=60,
@@ -290,8 +290,6 @@ for existing_deployment_monitor in existing_deployment_monitors_to_update:
     # Extract prefix from existing_deployment_monitor_name
     prefix = existing_deployment_monitor_name.split("-")[0]
 
-    jsonPath = "($count(data.result) = 0) or ($number(data.result[0].value[1]) > 0)"
-
     # Check if prefix information is available
     if prefix in prefix_info:
         prefix_data = prefix_info[prefix]
@@ -316,7 +314,7 @@ for existing_deployment_monitor in existing_deployment_monitors_to_update:
             "type":MonitorType.JSON_QUERY,
             "name":existing_deployment_monitor_name,
             "url":url,
-            "jsonPath":jsonPath,
+            "jsonPath":deployment_monitor_json_path,
             "jsonPathOperator":"==",
             "expectedValue":"true",
             "interval":60,
@@ -335,7 +333,7 @@ for existing_deployment_monitor in existing_deployment_monitors_to_update:
             type=MonitorType.JSON_QUERY,
             name=existing_deployment_monitor_name,
             url=url,
-            jsonPath=jsonPath,
+            jsonPath=deployment_monitor_json_path,
             jsonPathOperator="==",
             expectedValue="true",
             interval=60,
