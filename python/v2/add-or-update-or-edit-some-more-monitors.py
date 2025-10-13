@@ -63,8 +63,8 @@ filter_conditions = [
 ]
 
 # In-memory lists to store valid deployment names
-existing_deployments_to_update = []
-new_deployments_to_add = []
+existing_deployment_monitors_to_update = []
+new_deployment_monitors_to_add = []
 
 print("Processing names of all deployments")
 
@@ -106,18 +106,18 @@ for url, config in url_prefix_mapping.items():
                     if valid_substring:
                         full_deployment_name = f"{prefix}-{deployment_name}"
                         if any(monitor['name'] in full_deployment_name for monitor in monitor_info):
-                            existing_deployments_to_update.append(full_deployment_name)
+                            existing_deployment_monitors_to_update.append(full_deployment_name)
                         else:
-                            new_deployments_to_add.append(full_deployment_name)
+                            new_deployment_monitors_to_add.append(full_deployment_name)
 
-# Print the lists of existing and new deployments
-print("Existing Deployments:")
-for existing_deployment in existing_deployments_to_update:
-    print(existing_deployment)
+# Print the lists of existing and new deployment monitors
+print("Existing Deployment Monitors To Update:")
+for existing_deployment_monitor in existing_deployment_monitors_to_update:
+    print(existing_deployment_monitor)
 
-print("\New Deployments:")
-for new_deployment in new_deployments_to_add:
-    print(new_deployment)
+print("\nNew Deployment Monitors To Add:")
+for new_deployment_monitor in new_deployment_monitors_to_add:
+    print(new_deployment_monitor)
 
 # Dictionary to store information based on prefixes
 prefix_info = {
@@ -200,11 +200,11 @@ added_monitors = []
 api = UptimeKumaApi(url=uptime_kuma_uri, timeout=600)
 api.login(uptime_kuma_username, uptime_kuma_password)
 
-# Process new deployments
-for new_deployment in new_deployments_to_add:
-    print(f"Processing New Deployment: {new_deployment}")
-    # Extract prefix from new_deployment
-    prefix = new_deployment.split("-")[0]
+# Process new deployment monitors
+for new_deployment_monitor in new_deployment_monitors_to_add:
+    print(f"Processing New Deployment Monitor: {new_deployment_monitor}")
+    # Extract prefix from new_deployment_monitor
+    prefix = new_deployment_monitor.split("-")[0]
 
     jsonPath = "($count(data.result) = 0) or ($number(data.result[0].value[1]) > 0)"
 
@@ -220,16 +220,16 @@ for new_deployment in new_deployments_to_add:
 
         # Check if any keyword in parent_info matches the deployment name
         for keyword, parent_value in parent_info.items():
-            if keyword.lower() in new_deployment:
+            if keyword.lower() in new_deployment_monitor:
                 parent = parent_value
                 break
         # Replace placeholders in the URL template with deployment name
-        url = url_template.replace("<deployment>", new_deployment[len(prefix) + 1:])
+        url = url_template.replace("<deployment>", new_deployment_monitor[len(prefix) + 1:])
 
-        print("Adding New Monitor:")
+        print("Adding New Deployment Monitor:")
         print({
             "type":MonitorType.JSON_QUERY,
-            "name":new_deployment,
+            "name":new_deployment_monitor,
             "url":url,
             "jsonPath":jsonPath,
             "jsonPathOperator":"==",
@@ -247,7 +247,7 @@ for new_deployment in new_deployments_to_add:
 
         api.add_monitor(
                 type=MonitorType.JSON_QUERY,
-                name=new_deployment,
+                name=new_deployment_monitor,
                 url=url,
                 jsonPath=jsonPath,
                 jsonPathOperator="==",
@@ -261,7 +261,7 @@ for new_deployment in new_deployments_to_add:
                 notificationIDList=[1]
             )
 
-        added_monitors.append(new_deployment)
+        added_monitors.append(new_deployment_monitor)
     else:
         print(f"No information found for prefix: {prefix}")
 
@@ -278,10 +278,10 @@ api = UptimeKumaApi(url=uptime_kuma_uri, timeout=600)
 api.login(uptime_kuma_username, uptime_kuma_password)
 
 # Process existing deployments
-for existing_deployment in existing_deployments_to_update:
-    print(f"Processing Existing Deployment: {existing_deployment}")
-    # Extract prefix from existing_deployment
-    prefix = existing_deployment.split("-")[0]
+for existing_deployment_monitor in existing_deployment_monitors_to_update:
+    print(f"Processing Existing Deployment Monitor: {existing_deployment_monitor}")
+    # Extract prefix from existing_deployment_monitor
+    prefix = existing_deployment_monitor.split("-")[0]
 
     jsonPath = "($count(data.result) = 0) or ($number(data.result[0].value[1]) > 0)"
 
@@ -297,16 +297,16 @@ for existing_deployment in existing_deployments_to_update:
 
         # Check if any keyword in parent_info matches the deployment name
         for keyword, parent_value in parent_info.items():
-            if keyword.lower() in existing_deployment:
+            if keyword.lower() in existing_deployment_monitor:
                 parent = parent_value
                 break
         # Replace placeholders in the URL template with deployment name
-        url = url_template.replace("<deployment>", existing_deployment[len(prefix) + 1:])
+        url = url_template.replace("<deployment>", existing_deployment_monitor[len(prefix) + 1:])
 
-        print("Updating/Editing Existing Monitor:")
+        print("Updating/Editing Existing Deployment Monitor:")
         print({
             "type":MonitorType.JSON_QUERY,
-            "name":existing_deployment,
+            "name":existing_deployment_monitor,
             "url":url,
             "jsonPath":jsonPath,
             "jsonPathOperator":"==",
@@ -320,11 +320,11 @@ for existing_deployment in existing_deployments_to_update:
             "notificationIDList":[1]
         })
 
-        # Add the monitor using the provided add_monitor code
+        # Update the deployment monitor using the provided edit_monitor code
 
         api.edit_monitor(
             type=MonitorType.JSON_QUERY,
-            name=existing_deployment,
+            name=existing_deployment_monitor,
             url=url,
             jsonPath=jsonPath,
             jsonPathOperator="==",
@@ -338,7 +338,7 @@ for existing_deployment in existing_deployments_to_update:
             notificationIDList=[1]
         )
 
-        updated_monitors.append(existing_deployment)
+        updated_monitors.append(existing_deployment_monitor)
     else:
         print(f"No information found for prefix: {prefix}")
 

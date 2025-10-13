@@ -66,9 +66,9 @@ filter_conditions = [
     # Add more conditions here
 ]
 
-# In-memory lists to store valid statefulset names
-existing_statefulsets = []
-new_statefulsets_to_add = []
+# In-memory lists to store valid statefulset monitor names
+existing_statefulset_monitors = []
+new_statefulset_monitors_to_add = []
 
 # Process each URL
 for url, config in url_prefix_mapping.items():
@@ -108,18 +108,18 @@ for url, config in url_prefix_mapping.items():
                     if valid_substring:
                         full_statefulset_name = f"{prefix}-{statefulset_name}"
                         if any(monitor['name'] in full_statefulset_name for monitor in monitor_info):
-                            existing_statefulsets.append(full_statefulset_name)
+                            existing_statefulset_monitors.append(full_statefulset_name)
                         else:
-                            new_statefulsets_to_add.append(full_statefulset_name)
+                            new_statefulset_monitors_to_add.append(full_statefulset_name)
 
-# Print the lists of existing and new statefulsets
-print("Existing StatefulSets:")
-for existing_statefulset in existing_statefulsets:
-    print(existing_statefulset)
+# Print the lists of existing and new statefulset monitors
+print("Existing StatefulSet Monitors:")
+for existing_statefulset_monitor in existing_statefulset_monitors:
+    print(existing_statefulset_monitor)
 
-print("\nNew StatefulSets:")
-for new_statefulset in new_statefulsets_to_add:
-    print(new_statefulset)
+print("\nNew StatefulSet Monitors To Add:")
+for new_statefulset_monitor in new_statefulset_monitors_to_add:
+    print(new_statefulset_monitor)
 
 # Dictionary to store information based on prefixes
 prefix_info = {
@@ -238,7 +238,7 @@ prefix_info = {
     # Add more prefix information as needed
 }
 
-# List of words to check for in new_statefulset name
+# List of words to check for in new_statefulset_monitor name
 jsonPath_words = ["events-", "elasticsearch-", "zk-"]
 
 
@@ -247,15 +247,15 @@ added_monitors = []
 api = UptimeKumaApi(url=uptime_kuma_uri, timeout=600)
 api.login(uptime_kuma_username, uptime_kuma_password)
 
-# Process new statefulsets
-for new_statefulset in new_statefulsets_to_add:
-    print(f"Processing New StatefulSet: {new_statefulset}")
+# Process new statefulset monitors
+for new_statefulset_monitor in new_statefulset_monitors_to_add:
+    print(f"Processing New StatefulSet Monitor: {new_statefulset_monitor}")
 
-    # Extract prefix from new_statefulset
-    prefix = new_statefulset.split("-")[0]
+    # Extract prefix from new_statefulset_monitor
+    prefix = new_statefulset_monitor.split("-")[0]
 
     # Determine jsonPath value based on presence of specific words
-    if any(word in new_statefulset for word in jsonPath_words):
+    if any(word in new_statefulset_monitor for word in jsonPath_words):
         jsonPath = "($number(data.result[1]) in [0 ,1])"
     else:
         jsonPath = "($number(data.result[1]) = 0)"
@@ -272,16 +272,16 @@ for new_statefulset in new_statefulsets_to_add:
 
         # Check if any keyword in parent_info matches the statefulset name
         for keyword, parent_value in parent_info.items():
-            if keyword.lower() in new_statefulset:
+            if keyword.lower() in new_statefulset_monitor:
                 parent = parent_value
                 break
         # Replace placeholders in the URL template with statefulset name
-        url = url_template.replace("<statefulset>", new_statefulset[len(prefix) + 1:])
+        url = url_template.replace("<statefulset>", new_statefulset_monitor[len(prefix) + 1:])
 
-        print("Adding New Monitor:")
+        print("Adding New StatefulSet Monitor:")
         print({
             "type":MonitorType.JSON_QUERY,
-            "name":new_statefulset,
+            "name":new_statefulset_monitor,
             "url":url,
             "jsonPath":jsonPath,
             "jsonPathOperator":"==",
@@ -299,7 +299,7 @@ for new_statefulset in new_statefulsets_to_add:
 
         api.add_monitor(
                 type=MonitorType.JSON_QUERY,
-                name=new_statefulset,
+                name=new_statefulset_monitor,
                 url=url,
                 jsonPath=jsonPath,
                 jsonPathOperator="==",
@@ -313,7 +313,7 @@ for new_statefulset in new_statefulsets_to_add:
                 notificationIDList=[1]
             )
 
-        added_monitors.append(new_statefulset)
+        added_monitors.append(new_statefulset_monitor)
     else:
         print(f"No information found for prefix: {prefix}")
 
