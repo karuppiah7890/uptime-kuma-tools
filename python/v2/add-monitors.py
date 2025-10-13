@@ -72,6 +72,7 @@ non_matching_statefulsets = []
 
 # Process each URL
 for url, config in url_prefix_mapping.items():
+    print(f"Processing URL: {url}")
     prefix = config.get("prefix", "")
     basic_auth_pass = config.get("basic_auth_pass")
     basic_auth = f"tools-auser:{basic_auth_pass}"
@@ -87,7 +88,7 @@ for url, config in url_prefix_mapping.items():
     response = requests.get(url, headers=headers)
     data = response.json()
 
-    print(f"Response for {url}")
+    print(f"Response for {url}:")
     print(data)
 
     if "data" in data and "result" in data["data"]:
@@ -248,6 +249,8 @@ api.login(uptime_kuma_username, uptime_kuma_password)
 
 # Process non-matching statefulsets
 for non_matching_statefulset in non_matching_statefulsets:
+    print(f"Processing StatefulSet: {non_matching_statefulset}")
+
     # Extract prefix from non_matching_statefulset
     prefix = non_matching_statefulset.split("-")[0]
 
@@ -274,6 +277,23 @@ for non_matching_statefulset in non_matching_statefulsets:
                 break
         # Replace placeholders in the URL template with statefulset name
         url = url_template.replace("<statefulset>", non_matching_statefulset[len(prefix) + 1:])
+
+        print("Adding Monitor:")
+        print({
+            "type":MonitorType.JSON_QUERY,
+            "name":non_matching_statefulset,
+            "url":url,
+            "jsonPath":jsonPath,
+            "jsonPathOperator":"==",
+            "expectedValue":"false",
+            "interval":60,
+            "retryInterval":30,
+            "authMethod":AuthMethod.HTTP_BASIC,
+            "basic_auth_user":"tools-auser",
+            "basic_auth_pass":basic_auth_pass,
+            "parent":parent,
+            "notificationIDList":[1]
+        })
 
         # Add the monitor using the provided add_monitor code
 
