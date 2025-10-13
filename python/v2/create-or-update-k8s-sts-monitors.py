@@ -294,20 +294,20 @@ for new_statefulset_monitor in new_statefulset_monitors_to_add:
         # Add the monitor using the provided add_monitor code
 
         api.add_monitor(
-                type=MonitorType.JSON_QUERY,
-                name=new_statefulset_monitor,
-                url=url,
-                jsonPath=statefulset_monitor_json_path,
-                jsonPathOperator="==",
-                expectedValue="true",
-                interval=60,
-                retryInterval=30,
-                authMethod=AuthMethod.HTTP_BASIC,
-                basic_auth_user="tools-auser",
-                basic_auth_pass=basic_auth_pass,
-                parent=parent,
-                notificationIDList=[1]
-            )
+            type=MonitorType.JSON_QUERY,
+            name=new_statefulset_monitor,
+            url=url,
+            jsonPath=statefulset_monitor_json_path,
+            jsonPathOperator="==",
+            expectedValue="true",
+            interval=60,
+            retryInterval=30,
+            authMethod=AuthMethod.HTTP_BASIC,
+            basic_auth_user="tools-auser",
+            basic_auth_pass=basic_auth_pass,
+            parent=parent,
+            notificationIDList=[1]
+        )
 
         added_monitors.append(new_statefulset_monitor)
     else:
@@ -373,21 +373,21 @@ for existing_statefulset_monitor in existing_statefulset_monitors_to_update:
         # Edit the statefulset monitor using the provided edit_monitor code
 
         api.edit_monitor(
-                existing_statefulset_monitor_id,
-                type=MonitorType.JSON_QUERY,
-                name=existing_statefulset_monitor_name,
-                url=url,
-                jsonPath=statefulset_monitor_json_path,
-                jsonPathOperator="==",
-                expectedValue="true",
-                interval=60,
-                retryInterval=30,
-                authMethod=AuthMethod.HTTP_BASIC,
-                basic_auth_user="tools-auser",
-                basic_auth_pass=basic_auth_pass,
-                parent=parent,
-                notificationIDList=[1]
-            )
+            existing_statefulset_monitor_id,
+            type=MonitorType.JSON_QUERY,
+            name=existing_statefulset_monitor_name,
+            url=url,
+            jsonPath=statefulset_monitor_json_path,
+            jsonPathOperator="==",
+            expectedValue="true",
+            interval=60,
+            retryInterval=30,
+            authMethod=AuthMethod.HTTP_BASIC,
+            basic_auth_user="tools-auser",
+            basic_auth_pass=basic_auth_pass,
+            parent=parent,
+            notificationIDList=[1]
+        )
 
         updated_monitors.append(existing_statefulset_monitor_name)
     else:
